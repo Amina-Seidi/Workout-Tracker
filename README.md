@@ -1,6 +1,7 @@
 # Workout-Tracker
+Deployed Page: https://tracking-sweat.herokuapp.com/
 
-# Table of Contents
+## Table of Contents
 
  - [Description](#description)
  - [Installation](#installation)
