@@ -1,58 +1,40 @@
-const express = require("express");
-const router = express.Router();
-const db = require('../models/workout.js');
-
+const db = require('../models');
 
 module.exports = function(app) {
-    // middleware that is specific to this router
-    router.use(function timeLog(req, res, next) {
-      console.log("Time: ", Date.now());
-      next();
-    });
-    
-    router.get("/api/workouts", (req, res) => {
-      db.find()
-        .then(dbWorkout => {
-          res.json(dbWorkout);
+    app.get('/api/workouts', function(req, res) {
+        db.Workout.find({}).then(dbWorkouts => {
+            res.json(dbWorkouts)
         })
         .catch(err => {
-          res.json(err);
-        });
+            res.status(400).json(err);
+        })
     });
-    
-    router.post("/api/workouts", (req, res) => {
-        db.create({})
-      .then(dbWorkout => {
-        res.json(dbWorkout);
-      })
-      .catch(err => {
-        res.json(err);
-      });
-  });
-  
-  router.put("/api/workouts/:id", ({ body, params }, res) => {
-    db.findByIdAndUpdate(
-      params.id,
-      { $push: { exercises: body } },
-  
-      { new: true, runValidators: true }
-    )
-      .then(dbWorkout => {
-        res.json(dbWorkout);
-      })
-      .catch(err => {
-        res.json(err);
-      });
-  });
-  
-  router.get("/api/workouts/range", (req, res) => {
-    db.find({})
-      .then(dbWorkout => {
-        // console.log(dbWorkout)
-        res.json(dbWorkout);
-      })
-      .catch(err => {
-        res.json(err);
-      });
-  });
-  };
+
+    app.get('/api/workouts/range', function(req,res) {
+        db.Workout.find({}).then(dbWorkouts => {
+            res.json(dbWorkouts)
+        })
+        .catch(err => {
+            res.status(400).json(err);
+        })
+    });
+
+    app.post('/api/workouts', function(req, res) {
+        db.Workout.create(req.body).then(dbWorkouts => {
+            res.json(dbWorkouts)
+        })
+        .catch(err => {
+            res.status(400).json(err);
+        }) 
+    });
+
+    app.put('/api/workouts/:id', function(req,res){
+        db.Workout.findOneAndUpdate({_id: req.params.id}, {$push:{exercises: req.body}}, {new: true})
+            .then(dbWorkouts => {
+                res.json(dbWorkouts)
+            })
+            .catch(err => {
+                res.status(400).json(err);
+            })
+    });
+}
