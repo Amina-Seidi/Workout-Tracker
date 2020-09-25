@@ -1,26 +1,39 @@
-const express = require('express');
-const mongoose = require('mongoose')
-const morgan = require('morgan')
+// require npm packages 
+const express = require("express");
+const logger = require("morgan");
+const mongoose = require("mongoose");
+const compression = require("compression");
+
+// create route for user to have access to app
+require('dotenv').config()
+
+const PORT = process.env.PORT || 8080;
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-//Middleware
+
+app.use(logger("dev"));
+
+app.use(compression());
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(morgan('dev'));
-//Public resources
-app.use(express.static('public'));
-//Connect to MongoDB
+app.use(express.static("public"));
+
+app.set('port', PORT);
+
+ // create connection using mongoose
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false
+ useNewUrlParser: true,
+ useFindAndModify: false,
+ useUnifiedTopology: true
+})
+.then(() => console.log('DB Connected!'))
+.catch(err => {
+console.log("DB Connection Error: ${err.message}");
 });
-//Routes
-require('./routes/apiRoutes')(app);
-require('./routes/htmlRoutes')(app);
 
-
+// port for listen connectionls
+app.use(require("./routes/api.js"));
 app.listen(PORT, () => {
-    console.log(`App running on port ${PORT}!`);
-  });
+ console.log(`App running on port ${PORT}!`);
+});
